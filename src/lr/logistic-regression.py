@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 #網路上找的dataset 可以線性分割
 
@@ -14,35 +15,30 @@ dataset = np.array([
 ((1, 0.9, -0.5), 1),
 ((1, 0.7, -0.9), 1),
 ((1, 0.8, 0.2), 1),
+((1, 0.8, 0.7), -1), #non-linear point
 ((1, 0.4, -0.6), 1)])
 
-#判斷有沒有分類錯誤，並列印錯誤率
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 
-def check_error(w, dataset):
-    result = None
-    error = 0
-    for x, s in dataset:
+def gradient(dataset, w):
+    g = 0
+    for x,y in dataset:
         x = np.array(x)
-        if int(np.sign(w.T.dot(x))) != s:
-            result =  x, s
-            error += 1
-    print  "error=%s/%s" % (error, len(dataset))
-    return result
+        g += sigmoid(-y * w.T.dot(x)) * (-y * x)
+    return g / len(dataset)
 
-#PLA演算法實作
-
-def pla(dataset):
+def logistic(dataset):
     w = np.zeros(3)
-    while check_error(w, dataset) is not None:
-        x, s = check_error(w, dataset)
-        w += s * x
+    limit = 10
+    eta = 1
+    for i in range(limit):
+        w = w - eta * gradient(dataset, w)
+        eta *= 0.9
     return w
-
-
 #執行
 
-w = pla(dataset)
-
+w = logistic(dataset)
 #畫圖
 
 ps = [v[0] for v in dataset]
