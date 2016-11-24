@@ -9,11 +9,11 @@ import random
 #網路上找的dataset 可以線性分割
 
 dataset = np.array([
-((1, -0.4, 0.3), -1),
-((1, -0.3, -0.1), -1),
-((1, -0.2, 0.4), -1),
-((1, -0.1, 0.1), -1),
-((1, 0.6, -0.5), -1), #non-linear point
+((1, -0.4, 0.3), 0),
+((1, -0.3, -0.1), 0),
+((1, -0.2, 0.4), 0),
+((1, -0.1, 0.1), 0),
+((1, 0.6, -0.5), 0), #non-linear point
 ((1, 0.8, 0.7), 1),
 ((1, 0.9, -0.5), 1),
 ((1, 0.7, -0.9), 1),
@@ -28,27 +28,31 @@ def sgd(dataset, w):
     ind = random.randint(0, len(dataset) - 1)
     x, y = dataset[ind]
     x = np.array(x)
-    g = sigmoid(-y * w.T.dot(x)) * (-y * x)
+    error = sigmoid(w.T.dot(x))
+    g = (error - y) * x
     return g
 
-global_ind = 0
-def sgd2(dataset, w):
-    #run sgd sequently
-    global global_ind
-    if global_ind >= len(dataset): return 0
-
-    x, y = dataset[global_ind]
-    x = np.array(x)
-    g = sigmoid(-y * w.T.dot(x)) * (-y * x)
-    global_ind = global_ind + 1
-    return g
+def cost(dataset, w):
+    total_cost = 0
+    for x,y in dataset:
+        x = np.array(x)
+        error = sigmoid(w.T.dot(x))
+        total_cost += abs(y - error)
+    return total_cost
 
 def logistic(dataset):
     w = np.zeros(3)
-    limit = 100
+    limit = 200
     eta = 0.1
+    costs = []
     for i in range(limit):
-        w = w - eta * sgd2(dataset, w)
+        current_cost = cost(dataset, w)
+        print "current_cost=",current_cost
+        costs.append(current_cost)
+        w = w - eta * sgd(dataset, w)
+        eta = eta * 0.95
+    plt.plot(range(limit), costs)
+    plt.show()
     return w
 #執行
 

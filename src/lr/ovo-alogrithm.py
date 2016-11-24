@@ -8,10 +8,11 @@ def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
 def gradient(dataset, w):
-    g = 0
+    g = np.zeros(len(w))
     for x,y in dataset:
         x = np.array(x)
-        g += sigmoid(-y * w.T.dot(x)) * (-y * x)
+        error = sigmoid(w.T.dot(x))
+        g += (error - y) * x
     return g / len(dataset)
 
 def logistic(dataset):
@@ -37,7 +38,7 @@ def ovo(dataset, binary_classifier):
     for pair_class in training_class_set:
         c1, c2 = pair_class
         training_data = [ (v, 1) for v in c1[0]]
-        training_data += [ (v, -1) for v in c2[0]]
+        training_data += [ (v, 0) for v in c2[0]]
         classifier = (binary_classifier(training_data), (c1[1], c2[1]))
         classifier_set += [classifier]
 

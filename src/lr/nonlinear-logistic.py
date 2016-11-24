@@ -8,10 +8,11 @@ def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
 def gradient(dataset, w):
-    g = 0
+    g = np.zeros(len(w))
     for x,y in dataset:
         x = np.array(x)
-        g += sigmoid(-y * w.T.dot(x)) * (-y * x)
+        error = sigmoid(w.T.dot(x))
+        g += (error - y) * x
     return g / len(dataset)
 
 def logistic(dataset):
@@ -36,8 +37,9 @@ class2 = [(-10.1, -10.1), (10.2, 10.2), (10.3, -10.3), (-10.4, 10.4)]
 
 c1_dataset = tf(class1)
 c2_dataset = tf(class2)
+print c1_dataset
 training_set = [(v, 1) for v in c1_dataset]
-training_set += [(v, -1) for v in c2_dataset]
+training_set += [(v, 0) for v in c2_dataset]
 
 W = logistic(training_set)
 
