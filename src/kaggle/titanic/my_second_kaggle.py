@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-#from sklearn.model_selection import cross_val_score
+from sklearn.cross_validation import cross_val_score
 from sklearn.preprocessing import LabelEncoder
 
 #Read training data
@@ -57,4 +57,5 @@ results = pd.DataFrame({
 results.to_csv(SCRIPT_PATH + "/submission2.csv", index=False)
 
 
-#result = cross_val_score(ensemble.RandomForestClassifier(n_estimators=1000, max_depth=depth, max_features=maxFeat, oob_score=False), X, y, scoring='roc_auc', cv=2)
+cv_scores = np.mean(cross_val_score(model, training_data, training_label, scoring='roc_auc', cv=5))
+print cv_scores
