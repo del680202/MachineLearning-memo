@@ -67,13 +67,11 @@ W_fc1 = weight_variable([4*4*128, 128])
 b_fc1 = bias_variable([128])
 h_pool2_flat = tf.reshape(h_pool3, [-1, 4*4*128]) #[n_samples, 4,4,128]  => [n_samples, 4*4*128]
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
-## dropout4 layer ##
-h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
 ### func2 layer ##
 W_fc2 = weight_variable([128, 128])
 b_fc2 = bias_variable([128])
-h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+h_fc2 = tf.nn.relu(tf.matmul(h_fc1, W_fc2) + b_fc2)
 ## dropout5 layer ##
 h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
 
@@ -86,7 +84,7 @@ prediction = tf.nn.softmax(tf.matmul(h_fc2_drop, W_fc3) + b_fc3)
 # the error between prediction and real data
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction),
                                               reduction_indices=[1]))       # loss
-train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(1e-5).minimize(cross_entropy)
 
 sess = tf.Session()
 # important step
@@ -94,9 +92,9 @@ sess = tf.Session()
 # 2017-03-02 if using tensorflow >= 0.12
 sess.run(tf.initialize_all_variables())
 
-for i in range(2000):
+for i in range(40001):
     batch_xs, batch_ys = mnist.train.next_batch(100)
     sess.run(train_step, feed_dict={xs: batch_xs, ys: batch_ys, keep_prob: 0.5})
-    if i % 50 == 0:
+    if i % 1000 == 0:
         print(compute_accuracy(
             mnist.test.images, mnist.test.labels))

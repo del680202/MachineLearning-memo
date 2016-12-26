@@ -71,10 +71,9 @@ sess = tf.Session()
 # 2017-03-02 if using tensorflow >= 0.12
 sess.run(tf.initialize_all_variables())
 
-for i in range(1000):
+for i in range(20001):
     batch_xs, batch_ys = mnist.train.next_batch(100)
     sess.run(train_step, feed_dict={xs: batch_xs, ys: batch_ys, keep_prob: 0.5})
-    if i % 50 == 0:
+    if i % 1000 == 0:
         print(compute_accuracy(
             mnist.test.images, mnist.test.labels))
-
