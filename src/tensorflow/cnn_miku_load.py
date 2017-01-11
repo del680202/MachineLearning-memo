@@ -1,8 +1,6 @@
 
-
-import tensorflow as tf
 import numpy as np
-import os
+
 import tflearn
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.conv import conv_2d, max_pool_2d
@@ -11,25 +9,7 @@ from tflearn.layers.estimator import regression
 from tflearn.data_utils import load_image
 
 
-SCRIPT_PATH = os.path.dirname(os.path.abspath( __file__ ))
 
-num = 20
-imgs = []
-for i in range(1, num + 1):
-    imgs.append(np.asarray(load_image("%s/miku/%s.jpg" % (SCRIPT_PATH, i))))
-for i in range(1, num + 1):
-    imgs.append(np.asarray(load_image("%s/no-miku/%s.jpg" % (SCRIPT_PATH, i))))
-imgs = np.array(imgs)
-y_data = np.r_[np.c_[np.ones(num), np.zeros(num)],np.c_[np.zeros(num), np.ones(num)]]
-print imgs.shape
-print y_data.shape
-x_test = []
-for i in range(1, 11):
-    x_test.append(np.asarray(load_image("%s/test-set/%s.jpg" % (SCRIPT_PATH, i))))
-x_test =  np.array(x_test)
-y_test = np.r_[np.c_[np.ones(5), np.zeros(5)],np.c_[np.zeros(5), np.ones(5)]]
-print x_test.shape
-print y_test.shape
 
 # Building convolutional network
 network = input_data(shape=[None, 100, 100, 3], name='input')
@@ -47,9 +27,17 @@ network = fully_connected(network, 2, activation='softmax')
 network = regression(network, optimizer='adam', learning_rate=0.00001,
                      loss='categorical_crossentropy', name='target')
 
-# Training
-model = tflearn.DNN(network, tensorboard_verbose=0)
-model.fit({'input': imgs}, {'target': y_data}, n_epoch=500,
-           validation_set=({'input': x_test}, {'target': y_test}),
-           snapshot_step=100,show_metric=True, run_id='convnet_miku')
-model.save('miku_model.tflearn')
+model = tflearn.DNN(network)
+model.load('miku_model.tflearn')
+
+
+imgs = []
+num = 4
+for i in range(1, num + 1):
+    img = load_image("/tmp/t%s.jpg" % (i))
+    img = img.resize((100,100))
+    img_arr = np.asarray(img)
+    imgs.append(img_arr)
+imgs = np.array(imgs)
+print imgs.shape
+print np.round(model.predict(imgs))
